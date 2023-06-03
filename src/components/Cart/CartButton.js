@@ -5,7 +5,7 @@ import classes from "./CartButton.module.css";
 
 const CartButton = (props) => {
   const dispatch = useDispatch();
-  const itemsCount = useSelector( state => state.items);
+  const itemsCount = useSelector( state => state.totalQuantity);
 
   const toggleCart = () => {
     dispatch(cartActions.toggleCart());
@@ -14,7 +14,7 @@ const CartButton = (props) => {
   return (
     <button className={classes.button} onClick={toggleCart}>
       <span>My Cart</span>
-      <span className={classes.badge}>{itemsCount.reduce((n, {quantity}) => n + quantity, 0)}</span>
+      <span className={classes.badge}>{itemsCount}</span>
     </button>
   );
 };
