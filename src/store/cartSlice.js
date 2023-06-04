@@ -1,14 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { uiActions } from "./uiSlice";
 
-const initialCartState = { showCart: false, items: [], totalQuantity: 0 };
+const initialCartState = { items: [], totalQuantity: 0 };
 
 const cartSlice = createSlice({
   name: "cartSlice",
   initialState: initialCartState,
   reducers: {
-    toggleCart(state) {
-      state.showCart = !state.showCart;
-    },
     addItem(state, action) {
       const newItem = action.payload;
       const existingItem = state.items.find((item) => item.id === newItem.id);
@@ -39,6 +37,46 @@ const cartSlice = createSlice({
     },
   },
 });
+
+export const sendCartData = (cart) => {
+  return async (dispatch) => {
+    dispatch(
+      uiActions.showNotification({
+        status: "pending",
+        title: "Sending...",
+        message: "Sending cart data!",
+      })
+    );
+
+    const sendRequest = async () => {
+      const response = await fetch(
+        "https://custom-hook-492ab-default-rtdb.europe-west1.firebasedatabase.app/cart.json",
+        { method: "PUT", body: JSON.stringify(cart) }
+      );
+      if (!response.ok) {
+        throw new Error("Server call failed.");
+      }
+    }
+    try {
+      await sendRequest();
+      dispatch(
+        uiActions.showNotification({
+          status: "success",
+          title: "Success!",
+          message: "Sent cart data succesfully",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        uiActions.showNotification({
+          status: "error",
+          title: "Error!",
+          message: "Sending cart data failed!",
+        })
+      );
+    }
+  };
+};
 
 export const cartActions = cartSlice.actions;
 export default cartSlice.reducer;
